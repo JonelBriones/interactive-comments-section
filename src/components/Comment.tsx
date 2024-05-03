@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
-import comments from ".././data.json";
+import { useEffect } from "react";
 import AddComment from "./AddComment";
 export type CommentReply = {
   id: number;
@@ -15,6 +14,30 @@ export type CommentReply = {
   setCommentList: (value: any) => void;
 };
 
+export type CommentType = {
+  id: number;
+  content: string;
+  createdAt: string;
+  score: number;
+  user: {
+    image: {
+      png: string;
+      webp: string;
+    };
+    username: string;
+  };
+  replies: Reply[];
+  replyActive?: boolean;
+};
+type Reply = {
+  id: number;
+  content: string;
+  createdAt: string;
+  score: number;
+  replyingTo: string;
+  user: User;
+  replyActive?: boolean;
+};
 export type User = {
   image: {
     png: string;
@@ -22,20 +45,24 @@ export type User = {
   };
   username: string;
 };
+interface Props {
+  comment: CommentType | Reply;
+  setCommentList: (value: any) => void;
+  currentUser: User;
+  commentList: [];
+}
 
 const Comment = ({
-  id,
-  content,
-  createdAt,
-  score,
-  user,
-  replies,
-  replyingTo,
+  comment,
   currentUser,
-  replyActive,
-  commentList,
   setCommentList,
-}: CommentReply) => {
+  commentList,
+}: any) => {
+  console.log(comment);
+  const { id, content, createdAt, score, user, replies, replyActive } =
+    comment as CommentType;
+
+  console.log(replies);
   const replyShow = (id: number) => {
     setCommentList(
       commentList.map((comment: CommentReply) =>
@@ -46,9 +73,6 @@ const Comment = ({
     );
     console.log(commentList);
   };
-  useEffect(() => {
-    // setCommentList([...commentList, replies, comments.comments]);
-  }, []);
 
   return (
     <>
@@ -76,7 +100,7 @@ const Comment = ({
 
           <p className="text-left">
             <span className="text-primary-moderateBlue font-bold">
-              @{replyingTo}
+              {/* @{replies?.replyingTo} */}
             </span>{" "}
             {content}
           </p>
@@ -107,13 +131,20 @@ const Comment = ({
         </div>
       </div>
       {replyActive && <AddComment {...currentUser} />}
-      {replies?.map((reply: CommentReply) => {
+      {replies?.map((reply: Reply) => {
         return (
           <div
             key={reply.id}
             className="pl-4 mt-4 border-l-2 border-neutral-lightGray"
           >
-            <Comment {...reply} currentUser={currentUser} />
+            {/* comment={comment}
+              currentUser={currentUser}
+              setCommentList={setCommentList} */}
+            <Comment
+              comment={reply}
+              currentUser={currentUser}
+              //   setCommentList={setCommentList}
+            />
           </div>
         );
       })}

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import comments from "./data.json";
 import "./App.css";
-import Comment, { CommentReply } from "./components/Comment";
+import Comment, { CommentReply, CommentType } from "./components/Comment";
 import AddComment from "./components/AddComment";
 console.log(comments);
 
@@ -54,10 +54,6 @@ function App() {
     });
     setAllComments(joinedComments as any);
     console.log(joinedComments);
-
-    // for(const childComment of comments.comments) {
-    //   joinedComments.push(parentComment)
-    // }
   }, []);
   return (
     <div className="min-h-screen h-auto bg-neutral-veryLightGray p-4  ">
@@ -68,7 +64,7 @@ function App() {
         {commentList.map((comment) => (
           <div key={comment.id}>
             <Comment
-              {...(comment as CommentReply)}
+              comment={comment}
               currentUser={currentUser}
               setCommentList={setCommentList}
               commentList={commentList}
