@@ -1,5 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AddComment from "./AddComment";
+import comments from ".././data.json";
+
 export type CommentReply = {
   id: number;
   content: string;
@@ -28,6 +30,7 @@ export type CommentType = {
   };
   replies: Reply[];
   replyActive?: boolean;
+  replyingTo?: string;
 };
 type Reply = {
   id: number;
@@ -58,20 +61,43 @@ const Comment = ({
   setCommentList,
   commentList,
 }: any) => {
-  console.log(comment);
-  const { id, content, createdAt, score, user, replies, replyActive } =
-    comment as CommentType;
+  const {
+    id,
+    content,
+    createdAt,
+    score,
+    user,
+    replies,
+    replyActive,
+    replyingTo,
+  } = comment as CommentType;
+  useEffect(() => {}, []);
 
-  console.log(replies);
   const replyShow = (id: number) => {
-    setCommentList(
-      commentList.map((comment: CommentReply) =>
-        comment.id == id
-          ? { ...comment, replyActive: !comment.replyActive }
-          : comment
-      )
-    );
-    console.log(commentList);
+    if (comment.replyingTo) {
+      // show  replies comment reply
+      setCommentList(
+        commentList.map((parentComment: CommentType) => {
+          return {
+            ...parentComment,
+            replies: parentComment.replies.map((reply: Reply) =>
+              reply.id === id
+                ? { ...reply, replyActive: !reply.replyActive }
+                : reply
+            ),
+          };
+        })
+      );
+    } else {
+      // show  parent comment reply
+      setCommentList(
+        commentList.map((comment: CommentType) =>
+          comment.id == id
+            ? { ...comment, replyActive: !comment.replyActive }
+            : comment
+        )
+      );
+    }
   };
 
   return (
@@ -100,7 +126,7 @@ const Comment = ({
 
           <p className="text-left">
             <span className="text-primary-moderateBlue font-bold">
-              {/* @{replies?.replyingTo} */}
+              {replyingTo && `@${replyingTo}`}
             </span>{" "}
             {content}
           </p>
@@ -113,9 +139,12 @@ const Comment = ({
               <img src="../src/images/icon-minus.svg" alt="icon-minus" />
             </div>
             <div className="flex place-items-center">
+              <p>{}</p>
               <button
                 className="text-primary-moderateBlue font-bold"
-                onClick={() => replyShow(id)}
+                onClick={() => {
+                  replyShow(id);
+                }}
               >
                 {!replyActive ? (
                   <span className="flex gap-4 place-items-center">
@@ -137,13 +166,11 @@ const Comment = ({
             key={reply.id}
             className="pl-4 mt-4 border-l-2 border-neutral-lightGray"
           >
-            {/* comment={comment}
-              currentUser={currentUser}
-              setCommentList={setCommentList} */}
             <Comment
               comment={reply}
               currentUser={currentUser}
-              //   setCommentList={setCommentList}
+              commentList={commentList}
+              setCommentList={setCommentList}
             />
           </div>
         );

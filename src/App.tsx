@@ -41,7 +41,8 @@ function App() {
   const [allComments, setAllComments] = useState<CommentReply[]>([]);
   const [commentList, setCommentList] = useState(comments.comments);
   const [currentUser, setCurrentUser] = useState(comments.currentUser);
-  console.log("Parent Comment", parentComment);
+  console.log("comment list:", commentList);
+
   useEffect(() => {
     let joinedComments = [];
     for (const parentComment of comments.comments) {
@@ -53,7 +54,6 @@ function App() {
       }
     });
     setAllComments(joinedComments as any);
-    console.log(joinedComments);
   }, []);
   return (
     <div className="min-h-screen h-auto bg-neutral-veryLightGray p-4  ">
