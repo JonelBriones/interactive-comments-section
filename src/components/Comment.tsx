@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import AddComment from "./AddComment";
-import comments from ".././data.json";
 
 export type CommentReply = {
   id: number;
@@ -32,7 +31,7 @@ export type CommentType = {
   replyActive?: boolean;
   replyingTo?: string;
 };
-type Reply = {
+export type Reply = {
   id: number;
   content: string;
   createdAt: string;
@@ -48,18 +47,16 @@ export type User = {
   };
   username: string;
 };
-interface Props {
-  comment: CommentType | Reply;
-  setCommentList: (value: any) => void;
-  currentUser: User;
-  commentList: [];
-}
 
 const Comment = ({
   comment,
   currentUser,
   setCommentList,
   commentList,
+  parentInput,
+  input,
+  setInput,
+  onSubmit,
 }: any) => {
   const {
     id,
@@ -71,9 +68,10 @@ const Comment = ({
     replyActive,
     replyingTo,
   } = comment as CommentType;
-  useEffect(() => {}, []);
 
-  const replyShow = (id: number) => {
+  const refReply = useRef(null);
+  const like = (id: number) => {
+    if (score == 99) return;
     if (comment.replyingTo) {
       // show  replies comment reply
       setCommentList(
@@ -81,9 +79,7 @@ const Comment = ({
           return {
             ...parentComment,
             replies: parentComment.replies.map((reply: Reply) =>
-              reply.id === id
-                ? { ...reply, replyActive: !reply.replyActive }
-                : reply
+              reply.id === id ? { ...reply, score: reply.score + 1 } : reply
             ),
           };
         })
@@ -92,20 +88,66 @@ const Comment = ({
       // show  parent comment reply
       setCommentList(
         commentList.map((comment: CommentType) =>
-          comment.id == id
-            ? { ...comment, replyActive: !comment.replyActive }
-            : comment
+          comment.id == id ? { ...comment, score: comment.score + 1 } : comment
         )
       );
     }
   };
+  const dislike = (id: number) => {
+    if (score == 0) return;
+    if (comment.replyingTo) {
+      // show  replies comment reply
+      setCommentList(
+        commentList.map((parentComment: CommentType) => {
+          return {
+            ...parentComment,
+            replies: parentComment.replies.map((reply: Reply) =>
+              reply.id === id ? { ...reply, score: reply.score - 1 } : reply
+            ),
+          };
+        })
+      );
+    } else {
+      // show  parent comment reply
+      setCommentList(
+        commentList.map((comment: CommentType) =>
+          comment.id == id ? { ...comment, score: comment.score - 1 } : comment
+        )
+      );
+    }
+  };
+  const replyShow = (id: number) => {
+    // console.log(refReply.current);
+    setCommentList(
+      commentList.map((comment: CommentType) =>
+        comment.id == id
+          ? {
+              ...comment,
+              replyActive: !comment.replyActive,
+              replies: comment.replies.map((reply) => {
+                return { ...reply, replyActive: false };
+              }),
+            }
+          : {
+              ...comment,
+              replyActive: false,
+              replies: comment.replies.map((reply) =>
+                reply.id == id
+                  ? { ...reply, replyActive: !replyActive }
+                  : { ...reply, replyActive: false }
+              ),
+            }
+      )
+    );
+  };
+
+  useEffect(() => {
+    // replyShow(id);
+  }, []);
 
   return (
     <>
-      <div
-        key={id}
-        className="bg-neutral-white p-4 rounded-lg flex flex-col gap-2"
-      >
+      <div className="bg-neutral-white p-4 rounded-lg flex flex-col gap-2 ">
         <div className="flex flex-col gap-4 ">
           <div className="flex place-items-center justify-self-start gap-2">
             <img
@@ -131,15 +173,24 @@ const Comment = ({
             {content}
           </p>
           <div className="flex justify-between">
-            <div className="flex place-items-center gap-3 bg-neutral-veryLightGray w-fit py-2 px-3  rounded-lg">
-              <img src="../src/images/icon-plus.svg" alt="icon-plus" />
-              <span className="font-bold text-primary-moderateBlue">
+            <div className="flex place-items-center bg-neutral-veryLightGray w-fit rounded-lg md:flex-col">
+              <div
+                onClick={() => like(id)}
+                className="flex place-items-center justify-center size-full py-3 px-3 md:px-4 md:py-4"
+              >
+                <img src="../src/images/icon-plus.svg" alt="icon-plus" />
+              </div>
+              <span className="font-bold text-primary-moderateBlue min-w-6 md:w-2 text-center ">
                 {score}
               </span>
-              <img src="../src/images/icon-minus.svg" alt="icon-minus" />
+              <div
+                onClick={() => dislike(id)}
+                className="flex place-items-center justify-center size-full py-2 px-3 md:px-4 md:py-4 "
+              >
+                <img src="../src/images/icon-minus.svg" alt="icon-minus" />
+              </div>
             </div>
             <div className="flex place-items-center">
-              <p>{}</p>
               <button
                 className="text-primary-moderateBlue font-bold"
                 onClick={() => {
@@ -159,8 +210,19 @@ const Comment = ({
           </div>
         </div>
       </div>
-      {replyActive && <AddComment {...currentUser} />}
-      {replies?.map((reply: Reply) => {
+      <AddComment
+        showReply={comment.replyActive}
+        currentUser={currentUser}
+        input={input}
+        setInput={setInput}
+        onSubmit={onSubmit}
+        type={"child"}
+        replyTo={user}
+        replyShow={replyShow}
+        id={id}
+      />
+      {/* </div> */}
+      {/* {replies?.map((reply: Reply) => {
         return (
           <div
             key={reply.id}
@@ -171,10 +233,12 @@ const Comment = ({
               currentUser={currentUser}
               commentList={commentList}
               setCommentList={setCommentList}
+              setInput={setInput}
+              input={input}
             />
           </div>
         );
-      })}
+      })} */}
     </>
   );
 };

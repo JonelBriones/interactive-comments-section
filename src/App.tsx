@@ -1,9 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import comments from "./data.json";
 import "./App.css";
-import Comment, { CommentReply, CommentType } from "./components/Comment";
+import Comment, {
+  CommentReply,
+  CommentType,
+  Reply,
+} from "./components/Comment";
 import AddComment from "./components/AddComment";
-console.log(comments);
 
 // type User = {
 //   image: {
@@ -35,31 +38,51 @@ type User = {
 //   currentUser: CurrentUser;
 // };
 
-function App() {
-  const parentComment = comments.comments;
+const defaultInput: CommentType = {
+  content: "",
+  createdAt: "2 week ago",
+  id: 0,
+  replies: [],
+  score: 1,
+  user: {
+    image: {
+      png: "",
+      webp: "",
+    },
+    username: "",
+  },
+};
 
-  const [allComments, setAllComments] = useState<CommentReply[]>([]);
+function App() {
   const [commentList, setCommentList] = useState(comments.comments);
   const [currentUser, setCurrentUser] = useState(comments.currentUser);
-  console.log("comment list:", commentList);
+  const [input, setInput] = useState("");
+  const [parentInput, setParentInput] = useState("");
 
   useEffect(() => {
-    let joinedComments = [];
-    for (const parentComment of comments.comments) {
-      joinedComments.push(parentComment);
-    }
-    parentComment.forEach((comment) => {
-      if (comment.replies) {
-        comment.replies.forEach((reply) => joinedComments.push(reply));
-      }
-    });
-    setAllComments(joinedComments as any);
-  }, []);
+    console.log(commentList);
+  }, [commentList]);
+
+  const onSubmit = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    e.preventDefault();
+    setCommentList([
+      ...commentList,
+      {
+        ...defaultInput,
+        content: input,
+        user: currentUser,
+        id: Math.floor(Math.random() * 100000),
+      },
+    ]);
+    // console.log(commentList);
+    setInput("");
+  };
+
   return (
-    <div className="min-h-screen h-auto bg-neutral-veryLightGray p-4  ">
+    <div className="min-h-screen h-auto  bg-neutral-veryLightGray p-4 select-none ">
       <div
         className="flex
-      flex-col gap-4"
+      flex-col gap-4 m-auto container"
       >
         {commentList.map((comment) => (
           <div key={comment.id}>
@@ -68,11 +91,43 @@ function App() {
               currentUser={currentUser}
               setCommentList={setCommentList}
               commentList={commentList}
+              setParentInput={setParentInput}
+              input={input}
+              setInput={setInput}
+              onSubmit={onSubmit}
             />
+            {comment.replies?.map((reply: any) => {
+              return (
+                <div
+                  key={reply.id}
+                  className="pl-4 mt-4 border-l-2 border-neutral-lightGray"
+                  id="comments"
+                >
+                  <Comment
+                    comment={reply}
+                    currentUser={currentUser}
+                    commentList={commentList}
+                    setCommentList={setCommentList}
+                    input={input}
+                    setInput={setInput}
+                    onSubmit={onSubmit}
+                  />
+                </div>
+              );
+            })}
           </div>
         ))}
 
-        <AddComment {...currentUser} />
+        <AddComment
+          currentUser={currentUser}
+          setParentInput={setParentInput}
+          parentInput={parentInput}
+          input={input}
+          setInput={setInput}
+          onSubmit={onSubmit}
+          type={"parent"}
+          showReply={true}
+        />
         <div className="text-center text-xs">
           Challenge by{" "}
           <a href="https://www.frontendmentor.io?ref=challenge" target="_blank">
