@@ -7,6 +7,7 @@ import Comment, {
   Reply,
 } from "./components/Comment";
 import AddComment from "./components/AddComment";
+import { SiRepublicofgamers } from "react-icons/si";
 
 // type User = {
 //   image: {
@@ -44,6 +45,7 @@ const defaultInput: CommentType = {
   id: 0,
   replies: [],
   score: 1,
+  replyingTo: "",
   user: {
     image: {
       png: "",
@@ -57,24 +59,54 @@ function App() {
   const [commentList, setCommentList] = useState(comments.comments);
   const [currentUser, setCurrentUser] = useState(comments.currentUser);
   const [input, setInput] = useState("");
+
   const [parentInput, setParentInput] = useState("");
 
   useEffect(() => {
     console.log(commentList);
   }, [commentList]);
 
-  const onSubmit = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const onSubmit = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+    replyingTo: any,
+    parentID: number
+  ) => {
     e.preventDefault();
-    setCommentList([
-      ...commentList,
-      {
-        ...defaultInput,
-        content: input,
-        user: currentUser,
-        id: Math.floor(Math.random() * 100000),
-      },
-    ]);
-    // console.log(commentList);
+    let newComment = {
+      ...defaultInput,
+      content: input,
+      user: currentUser,
+      id: Math.floor(Math.random() * 100000),
+    };
+    console.log(replyingTo);
+    if (replyingTo) {
+      console.log("reply comment");
+      console.log(parentID);
+      setCommentList(
+        commentList.map((comment: CommentType) =>
+          comment.id === parentID || replyingTo === comment.user.username
+            ? {
+                ...comment,
+                replies: [
+                  ...comment.replies,
+                  { ...newComment, parentID, replyingTo },
+                ],
+              }
+            : comment
+        )
+      );
+    } else {
+      console.log("new comment");
+      setCommentList([
+        ...commentList,
+        {
+          ...defaultInput,
+          content: input,
+          user: currentUser,
+          id: Math.floor(Math.random() * 100000),
+        },
+      ]);
+    }
     setInput("");
   };
 
@@ -127,6 +159,7 @@ function App() {
           onSubmit={onSubmit}
           type={"parent"}
           showReply={true}
+          // replyTo={"Add Comment"}
         />
         <div className="text-center text-xs">
           Challenge by{" "}

@@ -8,39 +8,54 @@ const AddComment = (props: any) => {
     setInput,
     onSubmit,
     type,
-    replyTo,
+    user,
     showReply,
     replyShow,
     id,
-    setChildInput,
-    childInput,
+    comment,
   } = props;
 
   const { image } = currentUser;
+
   const inputRef = useRef(null) as any;
   useEffect(() => {
     if (inputRef.current && type == "child") {
       inputRef.current.focus();
-      inputRef.current.value = "@" + replyTo?.username + " ";
+      //   inputRef.current.value = "@" + user?.username + " ";
     }
   }, [showReply]);
-  //   console.log(refReply);
 
+  //   const {
+  //     id,
+  //     content,
+  //     createdAt,
+  //     score,
+  //     user,
+  //     replies,
+  //     replyActive,
+  //     replyingTo,
+  //     parentID,
+  //   } = comment as CommentType;
   return (
     <div
       className={`${
         showReply ? "" : "hidden"
       } flex flex-col gap-4 mt-4 bg-neutral-white p-4 rounded-lg`}
     >
-      <form onSubmit={onSubmit}>
+      <form
+        onSubmit={(e) => onSubmit(e, user?.username, comment?.parentID)}
+        className="relative"
+      >
         <textarea
           ref={inputRef}
-          className="pl-4 pt-2 border-2 border-neutral-lightGray rounded-lg w-full"
+          className={`pl-4 pt-2 border-2 border-neutral-lightGray rounded-lg w-full`}
           name="input"
           cols={30}
           rows={3}
-          placeholder={type == "parent" ? "Add Comment" : `@${input}`}
           value={input}
+          placeholder={
+            user?.username ? `@${user.username}` : `Add Comment ${input}`
+          }
           onChange={(e) => setInput(e.target.value)}
         />
         <div className="flex justify-between place-items-center">
@@ -52,7 +67,11 @@ const AddComment = (props: any) => {
           <button
             className="bg-primary-moderateBlue  text-neutral-white py-2 px-6 rounded-lg"
             type="submit"
-            onClick={() => replyShow(id)}
+            onClick={() => {
+              if (id) {
+                replyShow(id);
+              }
+            }}
           >
             SEND
           </button>

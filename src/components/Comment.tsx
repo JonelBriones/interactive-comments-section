@@ -27,6 +27,7 @@ export type CommentType = {
     };
     username: string;
   };
+  parentID?: number;
   replies: Reply[];
   replyActive?: boolean;
   replyingTo?: string;
@@ -37,6 +38,7 @@ export type Reply = {
   createdAt: string;
   score: number;
   replyingTo: string;
+  parentID: number;
   user: User;
   replyActive?: boolean;
 };
@@ -53,7 +55,6 @@ const Comment = ({
   currentUser,
   setCommentList,
   commentList,
-  parentInput,
   input,
   setInput,
   onSubmit,
@@ -67,9 +68,9 @@ const Comment = ({
     replies,
     replyActive,
     replyingTo,
+    parentID,
   } = comment as CommentType;
 
-  const refReply = useRef(null);
   const like = (id: number) => {
     if (score == 99) return;
     if (comment.replyingTo) {
@@ -117,7 +118,6 @@ const Comment = ({
     }
   };
   const replyShow = (id: number) => {
-    // console.log(refReply.current);
     setCommentList(
       commentList.map((comment: CommentType) =>
         comment.id == id
@@ -217,9 +217,10 @@ const Comment = ({
         setInput={setInput}
         onSubmit={onSubmit}
         type={"child"}
-        replyTo={user}
+        user={user}
         replyShow={replyShow}
         id={id}
+        comment={comment}
       />
       {/* </div> */}
       {/* {replies?.map((reply: Reply) => {
