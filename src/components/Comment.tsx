@@ -144,7 +144,16 @@ const Comment = ({
   useEffect(() => {
     // replyShow(id);
   }, []);
+  function daysAgo(createdAt: any) {
+    const now: any = new Date();
+    const diff = now - createdAt;
+    const days = diff / (1000 * 60 * 60 * 24);
+    return `${Math.floor(days)}`;
+  }
+  const formmatter = new Intl.DateTimeFormat(undefined);
+  const date = daysAgo(new Date(createdAt));
 
+  const daysAgoFormatter = formmatter.format(parseInt(date));
   return (
     <>
       <div className="bg-neutral-white p-4 rounded-lg flex flex-col gap-2 ">
@@ -163,7 +172,9 @@ const Comment = ({
                 you
               </span>
             )}
-            <span className="text-neutral-grayishBlue">{createdAt}</span>
+            <span className="text-neutral-grayishBlue">
+              {daysAgo(new Date(createdAt))} days ago
+            </span>
           </div>
 
           <p className="text-left">

@@ -41,7 +41,7 @@ type User = {
 
 const defaultInput: CommentType = {
   content: "",
-  createdAt: "2 week ago",
+  createdAt: "",
   id: 0,
   replies: [],
   score: 1,
@@ -66,6 +66,11 @@ function App() {
     console.log(commentList);
   }, [commentList]);
 
+  function createDate() {
+    const date = new Date();
+    const formattedDate = date.toISOString().split("T")[0];
+    return formattedDate;
+  }
   const onSubmit = (
     e: React.ChangeEvent<HTMLTextAreaElement>,
     replyingTo: any,
@@ -74,14 +79,13 @@ function App() {
     e.preventDefault();
     let newComment = {
       ...defaultInput,
+      createdAt: createDate(),
       content: input,
       user: currentUser,
       id: Math.floor(Math.random() * 100000),
     };
-    console.log(replyingTo);
+
     if (replyingTo) {
-      console.log("reply comment");
-      console.log(parentID);
       setCommentList(
         commentList.map((comment: CommentType) =>
           comment.id === parentID || replyingTo === comment.user.username
@@ -96,7 +100,6 @@ function App() {
         )
       );
     } else {
-      console.log("new comment");
       setCommentList([
         ...commentList,
         {
@@ -159,14 +162,13 @@ function App() {
           onSubmit={onSubmit}
           type={"parent"}
           showReply={true}
-          // replyTo={"Add Comment"}
         />
         <div className="text-center text-xs">
           Challenge by{" "}
           <a href="https://www.frontendmentor.io?ref=challenge" target="_blank">
             Frontend Mentor
           </a>
-          . Coded by <a href="#">Your Name Here</a>.
+          . Coded by <a href="#">Jonel Briones</a>.
         </div>
       </div>
     </div>
