@@ -7,6 +7,7 @@ const AddComment = (props: any) => {
     input,
     setInput,
     onSubmit,
+    onSubmitEdit,
     type,
     user,
     showReply,
@@ -19,23 +20,14 @@ const AddComment = (props: any) => {
 
   const inputRef = useRef(null) as any;
   useEffect(() => {
-    if (inputRef.current && type == "child") {
+    if (
+      (inputRef.current && type == "child") ||
+      (inputRef.current && type == "edit")
+    ) {
       inputRef.current.focus();
-      //   inputRef.current.value = "@" + user?.username + " ";
     }
   }, [showReply]);
 
-  //   const {
-  //     id,
-  //     content,
-  //     createdAt,
-  //     score,
-  //     user,
-  //     replies,
-  //     replyActive,
-  //     replyingTo,
-  //     parentID,
-  //   } = comment as CommentType;
   return (
     <div
       className={`${
@@ -43,7 +35,13 @@ const AddComment = (props: any) => {
       } flex flex-col gap-4 mt-4 bg-neutral-white p-4 rounded-lg`}
     >
       <form
-        onSubmit={(e) => onSubmit(e, user?.username, comment?.parentID)}
+        onSubmit={(e) => {
+          if (type == "edit") {
+            onSubmitEdit(e, user?.username, comment?.parentID, id);
+          } else {
+            onSubmit(e, user?.username, comment?.parentID, id);
+          }
+        }}
         className="relative"
       >
         <textarea

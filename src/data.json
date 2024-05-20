@@ -17,7 +17,7 @@
           "png": "./images/avatars/image-amyrobson.png",
           "webp": "./images/avatars/image-amyrobson.webp"
         },
-        "username": "amyrobson"
+        "username": "juliusomo"
       },
       "replies": [
         {
@@ -99,6 +99,20 @@
           }
         }
       ]
+    },
+    {
+      "id": 22222,
+      "content": "Testing delete function",
+      "createdAt": "2024-05-8",
+      "score": 16,
+      "user": {
+        "image": {
+          "png": "./images/avatars/image-amyrobson.png",
+          "webp": "./images/avatars/image-amyrobson.webp"
+        },
+        "username": "juliusomo"
+      },
+      "replies": []
     }
   ]
 }

@@ -112,12 +112,42 @@ function App() {
     }
     setInput("");
   };
+  const onSubmitEdit = (
+    e: React.ChangeEvent<HTMLTextAreaElement>,
+    replyingTo: any,
+    parentID: number,
+    id: number
+  ) => {
+    e.preventDefault();
+    console.log("edit submit");
+    setCommentList(
+      commentList.map((comment: CommentType) =>
+        comment.id == id
+          ? {
+              ...comment,
+              content: input,
+            }
+          : {
+              ...comment,
+              replies: comment.replies.map((reply) =>
+                reply.id == id
+                  ? {
+                      ...reply,
+                      content: input,
+                    }
+                  : reply
+              ),
+            }
+      )
+    );
+    setInput("");
+  };
 
   return (
     <div className="min-h-screen h-auto  bg-neutral-veryLightGray p-4 select-none ">
       <div
         className="flex
-      flex-col gap-4 m-auto container"
+      flex-col gap-4 mx-auto container"
       >
         {commentList.map((comment) => (
           <div key={comment.id}>
@@ -130,12 +160,13 @@ function App() {
               input={input}
               setInput={setInput}
               onSubmit={onSubmit}
+              onSubmitEdit={onSubmitEdit}
             />
             {comment.replies?.map((reply: any) => {
               return (
                 <div
                   key={reply.id}
-                  className="pl-4 mt-4 border-l-2 border-neutral-lightGray"
+                  className="pl-4 mt-4 border-l-2 border-neutral-lightGray md:pl-10 md:ml-10"
                   id="comments"
                 >
                   <Comment
@@ -146,6 +177,7 @@ function App() {
                     input={input}
                     setInput={setInput}
                     onSubmit={onSubmit}
+                    onSubmitEdit={onSubmitEdit}
                   />
                 </div>
               );
@@ -160,6 +192,7 @@ function App() {
           input={input}
           setInput={setInput}
           onSubmit={onSubmit}
+          onSubmitEdit={onSubmitEdit}
           type={"parent"}
           showReply={true}
         />
